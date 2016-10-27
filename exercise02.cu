@@ -43,7 +43,10 @@ int main(void) {
 	checkCUDAError("CUDA memcpy");
 
 	// Launch add() kernel on GPU
-	vectorAdd << <N / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(d_a, d_b, d_c, N);
+	// Number of blocks must be enough for all N values without truncation
+	dim3 blocksPerGrid((unsigned int)ceil(N / (double)THREADS_PER_BLOCK), 1, 1);
+	dim3 threadsPerBlock(THREADS_PER_BLOCK, 1, 1);
+	vectorAdd << <blocksPerGrid, threadsPerBlock >> >(d_a, d_b, d_c, N);
 	checkCUDAError("CUDA kernel");
 
 
